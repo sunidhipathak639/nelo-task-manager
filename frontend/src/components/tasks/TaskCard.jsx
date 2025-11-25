@@ -53,7 +53,7 @@ const TaskCard = ({ task, onEdit, onDelete, onToggle }) => {
   }
 
   return (
-    <Card className="hover:shadow-lg transition-all duration-200 border-l-4 border-l-clickup-purple cursor-grab active:cursor-grabbing group">
+    <Card className="hover:shadow-xl transition-all duration-200 border-l-4 border-l-clickup-purple cursor-grab active:cursor-grabbing group bg-white">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex-1">
@@ -94,8 +94,11 @@ const TaskCard = ({ task, onEdit, onDelete, onToggle }) => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onToggle(task.id)}
-            className="flex-1"
+            onClick={(e) => {
+              e.stopPropagation()
+              onToggle(task.id)
+            }}
+            className={`flex-1 ${task.status === 'Completed' ? 'bg-clickup-green/10 hover:bg-clickup-green/20 text-clickup-green border-clickup-green' : 'bg-clickup-blue/10 hover:bg-clickup-blue/20 text-clickup-blue border-clickup-blue'}`}
           >
             {task.status === 'Completed' ? (
               <>
@@ -112,15 +115,22 @@ const TaskCard = ({ task, onEdit, onDelete, onToggle }) => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onEdit(task)}
+            onClick={(e) => {
+              e.stopPropagation()
+              onEdit(task)
+            }}
+            className="hover:bg-clickup-purple/10 hover:border-clickup-purple hover:text-clickup-purple"
           >
             <Edit className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onDelete(task.id)}
-            className="text-destructive hover:text-destructive"
+            onClick={(e) => {
+              e.stopPropagation()
+              onDelete(task.id)
+            }}
+            className="text-clickup-red hover:bg-clickup-red/10 hover:border-clickup-red border-clickup-red/30"
           >
             <Trash2 className="h-4 w-4" />
           </Button>

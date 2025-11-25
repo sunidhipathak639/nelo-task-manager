@@ -117,12 +117,12 @@ const DraggableTaskList = ({ tasks, onEdit, onDelete, onToggle, onReorder }) => 
       </SortableContext>
       <DragOverlay>
         {activeTask ? (
-          <div className="opacity-90 rotate-2 scale-105">
+          <div className="opacity-95 rotate-3 scale-105 shadow-2xl">
             <TaskCard
               task={activeTask}
-              onEdit={onEdit}
-              onDelete={onDelete}
-              onToggle={onToggle}
+              onEdit={() => {}}
+              onDelete={() => {}}
+              onToggle={() => {}}
             />
           </div>
         ) : null}
