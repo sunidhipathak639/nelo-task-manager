@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { authService } from '@/services/authService'
 import { Loader2, Mail, Lock, User } from 'lucide-react'
+import { useTheme } from '@/contexts/ThemeContext'
 
 const Login = () => {
   const [isRegister, setIsRegister] = useState(false)
