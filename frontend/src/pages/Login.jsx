@@ -14,6 +14,7 @@ const Login = () => {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
+  const { theme } = useTheme()
   const navigate = useNavigate()
 
   const validateEmail = (email) => {
@@ -75,8 +76,8 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 p-4">
-      <Card className="w-full max-w-md shadow-2xl border-2 bg-white">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4 transition-colors duration-200">
+      <Card className="w-full max-w-md shadow-2xl border-2 bg-white dark:bg-gray-800 dark:border-gray-700">
         <CardHeader className="space-y-1 text-center bg-gradient-to-r from-clickup-purple/10 to-clickup-blue/10">
           <CardTitle className="text-4xl font-bold bg-gradient-to-r from-clickup-purple via-clickup-blue to-clickup-teal bg-clip-text text-transparent">
             NELO Task Manager
