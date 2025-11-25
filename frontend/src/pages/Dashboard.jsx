@@ -14,7 +14,7 @@ import ConfirmDialog from '@/components/common/ConfirmDialog'
 import { taskService } from '@/services/taskService'
 import { authService } from '@/services/authService'
 import { getSession } from '@/utils/sessionStorage'
-import { Plus, LogOut, Loader2, LayoutGrid, Columns3, Filter, Search, X, AlertCircle } from 'lucide-react'
+import { Plus, LogOut, Loader2, LayoutGrid, Columns3, Filter, Search, X, AlertCircle, User, ChevronDown, Bell, Settings } from 'lucide-react'
 import { format } from 'date-fns'
 
 const Dashboard = () => {
@@ -30,6 +30,8 @@ const Dashboard = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [viewMode, setViewMode] = useState('kanban') // 'kanban' or 'grid'
   const [error, setError] = useState('')
+  const [userInfo, setUserInfo] = useState(null)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -40,8 +42,20 @@ const Dashboard = () => {
       return
     }
 
+    fetchUserInfo()
     fetchTasks()
   }, [navigate])
+
+  const fetchUserInfo = async () => {
+    try {
+      const result = await authService.verify()
+      if (result.success) {
+        setUserInfo(result.user)
+      }
+    } catch (err) {
+      console.error('Failed to fetch user info:', err)
+    }
+  }
 
   useEffect(() => {
     filterTasks()
@@ -204,53 +218,164 @@ const Dashboard = () => {
     setDeleteDialogOpen(true)
   }
 
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userMenuOpen && !event.target.closest('.user-menu-container')) {
+        setUserMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [userMenuOpen])
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Header */}
-        <Card className="mb-6 border-2 shadow-lg bg-white">
-          <CardHeader>
+        {/* Header - Enhanced with User Info */}
+        <Card className="mb-6 border-2 shadow-xl bg-white/95 backdrop-blur-sm">
+          <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-4xl font-bold bg-gradient-to-r from-clickup-purple via-clickup-blue to-clickup-teal bg-clip-text text-transparent">
-                  Task Dashboard
-                </CardTitle>
-                <CardDescription className="mt-2 text-gray-600">
-                  Drag and drop to reorder • Manage your tasks efficiently
-                </CardDescription>
+              {/* Left Section - Title & Description */}
+              <div className="flex-1">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-gradient-to-br from-clickup-purple to-clickup-blue rounded-xl shadow-lg">
+                    <LayoutGrid className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-4xl font-bold bg-gradient-to-r from-clickup-purple via-clickup-blue to-clickup-teal bg-clip-text text-transparent">
+                      Task Dashboard
+                    </CardTitle>
+                    <CardDescription className="mt-1.5 text-gray-600 flex items-center gap-2">
+                      <span>Welcome back{userInfo?.name ? `, ${userInfo.name.split(' ')[0]}` : ''}!</span>
+                      <span>•</span>
+                      <span>{tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}</span>
+                      <span>•</span>
+                      <span>{filteredTasks.length} {filteredTasks.length === 1 ? 'shown' : 'shown'}</span>
+                    </CardDescription>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1 border rounded-lg p-1 bg-white">
+
+              {/* Right Section - Actions & User */}
+              <div className="flex items-center gap-3">
+                {/* View Mode Toggle */}
+                <div className="flex items-center gap-1 border-2 border-gray-200 rounded-xl p-1 bg-gray-50/50">
                   <Button
                     variant={viewMode === 'kanban' ? 'default' : 'ghost'}
                     size="sm"
                     onClick={() => setViewMode('kanban')}
-                    className={viewMode === 'kanban' ? 'bg-clickup-purple hover:bg-clickup-purple/90 text-white' : ''}
+                    className={`${viewMode === 'kanban' ? 'bg-clickup-purple hover:bg-clickup-purple/90 text-white shadow-md' : 'hover:bg-white'} transition-all duration-200`}
                   >
-                    <Columns3 className="h-4 w-4 mr-1" />
+                    <Columns3 className="h-4 w-4 mr-1.5" />
                     Kanban
                   </Button>
                   <Button
                     variant={viewMode === 'grid' ? 'default' : 'ghost'}
                     size="sm"
                     onClick={() => setViewMode('grid')}
-                    className={viewMode === 'grid' ? 'bg-clickup-purple hover:bg-clickup-purple/90 text-white' : ''}
+                    className={`${viewMode === 'grid' ? 'bg-clickup-purple hover:bg-clickup-purple/90 text-white shadow-md' : 'hover:bg-white'} transition-all duration-200`}
                   >
-                    <LayoutGrid className="h-4 w-4 mr-1" />
+                    <LayoutGrid className="h-4 w-4 mr-1.5" />
                     Grid
                   </Button>
                 </div>
+
+                {/* New Task Button */}
                 <Button 
                   onClick={openCreateDialog} 
-                  className="gap-2 bg-clickup-purple hover:bg-clickup-purple/90 text-white shadow-md hover:shadow-lg transition-all"
+                  className="gap-2 bg-gradient-to-r from-clickup-purple to-clickup-blue hover:from-clickup-purple/90 hover:to-clickup-blue/90 text-white shadow-lg hover:shadow-xl transition-all duration-200 font-semibold"
                 >
                   <Plus className="h-4 w-4" />
                   New Task
                 </Button>
-                <Button variant="outline" onClick={handleLogout} className="gap-2 border-gray-300 hover:bg-gray-50">
-                  <LogOut className="h-4 w-4" />
-                  Logout
-                </Button>
+
+                {/* User Profile Section */}
+                <div className="relative user-menu-container">
+                  <button
+                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                    className="flex items-center gap-3 px-4 py-2 rounded-xl border-2 border-gray-200 hover:border-clickup-purple/50 bg-white hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md group"
+                  >
+                    <div className="flex items-center gap-3">
+                      {/* User Avatar */}
+                      <div className="h-10 w-10 rounded-full bg-gradient-to-br from-clickup-purple to-clickup-blue flex items-center justify-center text-white font-semibold shadow-md group-hover:shadow-lg transition-all">
+                        {userInfo?.name ? (
+                          userInfo.name.charAt(0).toUpperCase()
+                        ) : (
+                          <User className="h-5 w-5" />
+                        )}
+                      </div>
+                      {/* User Info */}
+                      <div className="text-left hidden md:block">
+                        <div className="text-sm font-semibold text-gray-900">
+                          {userInfo?.name || 'User'}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {userInfo?.email || 'user@example.com'}
+                        </div>
+                      </div>
+                    </div>
+                    <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${userMenuOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {/* User Dropdown Menu */}
+                  {userMenuOpen && (
+                    <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border-2 border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                      <div className="p-4 bg-gradient-to-r from-clickup-purple/10 to-clickup-blue/10 border-b border-gray-200">
+                        <div className="flex items-center gap-3">
+                          <div className="h-12 w-12 rounded-full bg-gradient-to-br from-clickup-purple to-clickup-blue flex items-center justify-center text-white font-semibold shadow-md">
+                            {userInfo?.name ? (
+                              userInfo.name.charAt(0).toUpperCase()
+                            ) : (
+                              <User className="h-6 w-6" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-semibold text-gray-900 truncate">
+                              {userInfo?.name || 'User'}
+                            </div>
+                            <div className="text-xs text-gray-500 truncate">
+                              {userInfo?.email || 'user@example.com'}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="p-2">
+                        <button
+                          onClick={() => {
+                            setUserMenuOpen(false)
+                            // Add settings functionality here
+                          }}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700"
+                        >
+                          <Settings className="h-4 w-4 text-gray-500" />
+                          Settings
+                        </button>
+                        <button
+                          onClick={() => {
+                            setUserMenuOpen(false)
+                            // Add notifications functionality here
+                          }}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700"
+                        >
+                          <Bell className="h-4 w-4 text-gray-500" />
+                          Notifications
+                        </button>
+                        <div className="border-t border-gray-200 my-1"></div>
+                        <button
+                          onClick={() => {
+                            setUserMenuOpen(false)
+                            handleLogout()
+                          }}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors text-sm text-gray-700"
+                        >
+                          <LogOut className="h-4 w-4" />
+                          Logout
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </CardHeader>
