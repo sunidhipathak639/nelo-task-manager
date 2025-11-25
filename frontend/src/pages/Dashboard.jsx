@@ -16,6 +16,7 @@ import { taskService } from '@/services/taskService'
 import { authService } from '@/services/authService'
 import { getSession } from '@/utils/sessionStorage'
 import { Plus, LogOut, Loader2, LayoutGrid, Columns3, Filter, Search, X, AlertCircle, User } from 'lucide-react'
+import NotificationBell from '@/components/notifications/NotificationBell'
 import { format } from 'date-fns'
 
 const Dashboard = () => {
@@ -32,6 +33,7 @@ const Dashboard = () => {
   const [viewMode, setViewMode] = useState('kanban') // 'kanban' or 'grid'
   const [error, setError] = useState('')
   const [userInfo, setUserInfo] = useState(null)
+  const [notifications, setNotifications] = useState([])
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -44,7 +46,68 @@ const Dashboard = () => {
 
     fetchUserInfo()
     fetchTasks()
+    initializeNotifications()
   }, [navigate])
+
+  const initializeNotifications = () => {
+    if (tasks.length === 0) {
+      setNotifications([])
+      return
+    }
+
+    const newNotifications = []
+
+    // Check for overdue tasks
+    tasks.forEach(task => {
+      if (task.status === 'Completed') return
+      
+      try {
+        const dueDate = new Date(task.due_date)
+        const now = new Date()
+        if (dueDate < now && dueDate.toDateString() !== now.toDateString()) {
+          newNotifications.push({
+            id: `overdue-${task.id}`,
+            type: 'task_due',
+            title: 'Task Overdue',
+            message: `"${task.title}" is overdue`,
+            read: false,
+            createdAt: task.due_date || new Date().toISOString(),
+            taskId: task.id
+          })
+        }
+      } catch {
+        // Skip invalid dates
+      }
+    })
+
+    // Add task completion notifications
+    tasks.forEach(task => {
+      if (task.status === 'Completed') {
+        newNotifications.push({
+          id: `completed-${task.id}`,
+          type: 'task_completed',
+          title: 'Task Completed',
+          message: `"${task.title}" has been completed`,
+          read: false,
+          createdAt: task.updated_at || task.created_at || new Date().toISOString(),
+          taskId: task.id
+        })
+      }
+    })
+
+    // Sort by date (newest first)
+    newNotifications.sort((a, b) => 
+      new Date(b.createdAt) - new Date(a.createdAt)
+    )
+
+    setNotifications(newNotifications)
+  }
+
+  useEffect(() => {
+    if (tasks.length > 0) {
+      initializeNotifications()
+    }
+  }, [tasks])
 
   const fetchUserInfo = async () => {
     try {
@@ -157,10 +220,23 @@ const Dashboard = () => {
 
   const handleToggleStatus = async (taskId) => {
     try {
+      const task = tasks.find(t => t.id === taskId)
       const result = await taskService.toggleTaskStatus(taskId)
       
       if (result.success) {
         await fetchTasks()
+        // Add notification for status change
+        const newStatus = task?.status === 'Pending' ? 'Completed' : 'Pending'
+        const newNotification = {
+          id: `status-${taskId}-${Date.now()}`,
+          type: newStatus === 'Completed' ? 'task_completed' : 'task_created',
+          title: newStatus === 'Completed' ? 'Task Completed' : 'Task Reopened',
+          message: `"${task?.title}" has been marked as ${newStatus.toLowerCase()}`,
+          read: false,
+          createdAt: new Date().toISOString(),
+          taskId: taskId
+        }
+        setNotifications(prev => [newNotification, ...prev])
       } else {
         setError(result.error)
       }
@@ -201,6 +277,18 @@ const Dashboard = () => {
 
   const handleLogout = () => {
     authService.logout()
+  }
+
+  const handleMarkAsRead = (notificationId) => {
+    setNotifications(prev => 
+      prev.map(notif => 
+        notif.id === notificationId ? { ...notif, read: true } : notif
+      )
+    )
+  }
+
+  const handleClearAllNotifications = () => {
+    setNotifications([])
   }
 
   const openCreateDialog = () => {
@@ -278,6 +366,13 @@ const Dashboard = () => {
                   <Plus className="h-4 w-4" />
                   New Task
                 </Button>
+
+                {/* Notifications Bell */}
+                <NotificationBell
+                  notifications={notifications}
+                  onMarkAsRead={handleMarkAsRead}
+                  onClearAll={handleClearAllNotifications}
+                />
 
                 {/* User Info & Logout - Compact */}
                 <div className="flex items-center gap-3">
