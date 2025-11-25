@@ -14,7 +14,7 @@ import ConfirmDialog from '@/components/common/ConfirmDialog'
 import { taskService } from '@/services/taskService'
 import { authService } from '@/services/authService'
 import { getSession } from '@/utils/sessionStorage'
-import { Plus, LogOut, Loader2, LayoutGrid, Columns3, Filter, Search, X, AlertCircle, User, ChevronDown, Bell, Settings } from 'lucide-react'
+import { Plus, LogOut, Loader2, LayoutGrid, Columns3, Filter, Search, X, AlertCircle, User } from 'lucide-react'
 import { format } from 'date-fns'
 
 const Dashboard = () => {
@@ -31,7 +31,6 @@ const Dashboard = () => {
   const [viewMode, setViewMode] = useState('kanban') // 'kanban' or 'grid'
   const [error, setError] = useState('')
   const [userInfo, setUserInfo] = useState(null)
-  const [userMenuOpen, setUserMenuOpen] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -218,17 +217,6 @@ const Dashboard = () => {
     setDeleteDialogOpen(true)
   }
 
-  // Close user menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (userMenuOpen && !event.target.closest('.user-menu-container')) {
-        setUserMenuOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [userMenuOpen])
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -290,91 +278,37 @@ const Dashboard = () => {
                   New Task
                 </Button>
 
-                {/* User Profile Section */}
-                <div className="relative user-menu-container">
-                  <button
-                    onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className="flex items-center gap-3 px-4 py-2 rounded-xl border-2 border-gray-200 hover:border-clickup-purple/50 bg-white hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md group"
-                  >
-                    <div className="flex items-center gap-3">
-                      {/* User Avatar */}
-                      <div className="h-10 w-10 rounded-full bg-gradient-to-br from-clickup-purple to-clickup-blue flex items-center justify-center text-white font-semibold shadow-md group-hover:shadow-lg transition-all">
-                        {userInfo?.name ? (
-                          userInfo.name.charAt(0).toUpperCase()
-                        ) : (
-                          <User className="h-5 w-5" />
-                        )}
+                {/* User Info & Logout - Compact */}
+                <div className="flex items-center gap-3">
+                  {/* User Avatar & Info */}
+                  <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-white border border-gray-200">
+                    <div className="h-8 w-8 rounded-full bg-gradient-to-br from-clickup-purple to-clickup-blue flex items-center justify-center text-white text-xs font-semibold shadow-sm">
+                      {userInfo?.name ? (
+                        userInfo.name.charAt(0).toUpperCase()
+                      ) : (
+                        <User className="h-4 w-4" />
+                      )}
+                    </div>
+                    <div className="text-left hidden md:block">
+                      <div className="text-xs font-semibold text-gray-900 leading-tight">
+                        {userInfo?.name?.split(' ')[0] || 'User'}
                       </div>
-                      {/* User Info */}
-                      <div className="text-left hidden md:block">
-                        <div className="text-sm font-semibold text-gray-900">
-                          {userInfo?.name || 'User'}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {userInfo?.email || 'user@example.com'}
-                        </div>
+                      <div className="text-[10px] text-gray-500 leading-tight truncate max-w-[120px]">
+                        {userInfo?.email || 'user@example.com'}
                       </div>
                     </div>
-                    <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${userMenuOpen ? 'rotate-180' : ''}`} />
-                  </button>
+                  </div>
 
-                  {/* User Dropdown Menu */}
-                  {userMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border-2 border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                      <div className="p-4 bg-gradient-to-r from-clickup-purple/10 to-clickup-blue/10 border-b border-gray-200">
-                        <div className="flex items-center gap-3">
-                          <div className="h-12 w-12 rounded-full bg-gradient-to-br from-clickup-purple to-clickup-blue flex items-center justify-center text-white font-semibold shadow-md">
-                            {userInfo?.name ? (
-                              userInfo.name.charAt(0).toUpperCase()
-                            ) : (
-                              <User className="h-6 w-6" />
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="text-sm font-semibold text-gray-900 truncate">
-                              {userInfo?.name || 'User'}
-                            </div>
-                            <div className="text-xs text-gray-500 truncate">
-                              {userInfo?.email || 'user@example.com'}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="p-2">
-                        <button
-                          onClick={() => {
-                            setUserMenuOpen(false)
-                            // Add settings functionality here
-                          }}
-                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700"
-                        >
-                          <Settings className="h-4 w-4 text-gray-500" />
-                          Settings
-                        </button>
-                        <button
-                          onClick={() => {
-                            setUserMenuOpen(false)
-                            // Add notifications functionality here
-                          }}
-                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700"
-                        >
-                          <Bell className="h-4 w-4 text-gray-500" />
-                          Notifications
-                        </button>
-                        <div className="border-t border-gray-200 my-1"></div>
-                        <button
-                          onClick={() => {
-                            setUserMenuOpen(false)
-                            handleLogout()
-                          }}
-                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors text-sm text-gray-700"
-                        >
-                          <LogOut className="h-4 w-4" />
-                          Logout
-                        </button>
-                      </div>
-                    </div>
-                  )}
+                  {/* Logout Button */}
+                  <Button 
+                    variant="outline" 
+                    onClick={handleLogout} 
+                    className="gap-2 border-gray-300 hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition-all duration-200"
+                    size="sm"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span className="hidden sm:inline">Logout</span>
+                  </Button>
                 </div>
               </div>
             </div>
