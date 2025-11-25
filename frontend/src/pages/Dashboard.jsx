@@ -176,6 +176,17 @@ const Dashboard = () => {
       if (result.success) {
         setIsTaskFormOpen(false)
         await fetchTasks()
+        // Add notification for new task
+        const newNotification = {
+          id: `task-${Date.now()}`,
+          type: 'task_created',
+          title: 'New Task Created',
+          message: `"${taskData.title}" has been created`,
+          read: false,
+          createdAt: new Date().toISOString(),
+          taskId: result.task?.id
+        }
+        setNotifications(prev => [newNotification, ...prev])
       } else {
         setError(result.error)
       }
