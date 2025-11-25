@@ -19,7 +19,7 @@ const NotificationBell = ({ notifications, onMarkAsRead, onClearAll }) => {
         <Button
           variant="outline"
           size="sm"
-          className="relative border-gray-300 hover:bg-gray-50 hover:border-clickup-purple/50 transition-all"
+          className="relative border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-clickup-purple/50 transition-all"
         >
           <Bell className="h-4 w-4" />
           {unreadCount > 0 && (

@@ -49,13 +49,13 @@ const NotificationList = ({ notifications, onMarkAsRead, onClearAll, onClose }) 
   }
 
   return (
-    <div className="flex flex-col max-h-[500px]">
+    <div className="flex flex-col max-h-[500px] bg-white dark:bg-gray-800">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-clickup-purple/5 to-clickup-blue/5">
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-clickup-purple/5 to-clickup-blue/5 dark:from-clickup-purple/10 dark:to-clickup-blue/10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Bell className="h-5 w-5 text-clickup-purple" />
-            <h3 className="font-semibold text-gray-900">Notifications</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100">Notifications</h3>
             {unreadCount > 0 && (
               <Badge className="bg-clickup-red text-white text-xs">
                 {unreadCount} new
@@ -67,7 +67,7 @@ const NotificationList = ({ notifications, onMarkAsRead, onClearAll, onClose }) 
               variant="ghost"
               size="sm"
               onClick={onClearAll}
-              className="text-xs text-gray-600 hover:text-clickup-red"
+              className="text-xs text-gray-600 dark:text-gray-400 hover:text-clickup-red"
             >
               Clear all
             </Button>
@@ -84,12 +84,12 @@ const NotificationList = ({ notifications, onMarkAsRead, onClearAll, onClose }) 
             <p className="text-xs text-gray-400 mt-1">You're all caught up!</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-gray-100 dark:divide-gray-700">
             {notifications.map((notification) => (
               <div
                 key={notification.id}
-                className={`p-4 hover:bg-gray-50 transition-colors cursor-pointer ${
-                  !notification.read ? getNotificationColor(notification.type) : 'bg-white'
+                className={`p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer ${
+                  !notification.read ? getNotificationColor(notification.type) : 'bg-white dark:bg-gray-800'
                 }`}
                 onClick={() => {
                   if (!notification.read) {
@@ -107,15 +107,15 @@ const NotificationList = ({ notifications, onMarkAsRead, onClearAll, onClose }) 
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1">
                         <p className={`text-sm font-medium ${
-                          !notification.read ? 'text-gray-900' : 'text-gray-600'
+                          !notification.read ? 'text-gray-900 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400'
                         }`}>
                           {notification.title}
                         </p>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                           {notification.message}
                         </p>
                         <div className="flex items-center gap-2 mt-2">
-                          <span className="text-[10px] text-gray-400">
+                          <span className="text-[10px] text-gray-400 dark:text-gray-500">
                             {formatTime(notification.createdAt)}
                           </span>
                           {!notification.read && (
@@ -136,7 +136,7 @@ const NotificationList = ({ notifications, onMarkAsRead, onClearAll, onClose }) 
 
       {/* Footer */}
       {notifications.length > 0 && (
-        <div className="p-3 border-t border-gray-200 bg-gray-50">
+        <div className="p-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
           <Button
             variant="ghost"
             size="sm"

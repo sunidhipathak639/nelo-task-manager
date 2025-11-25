@@ -15,8 +15,9 @@ import { GridSkeleton, KanbanSkeleton } from '@/components/common/SkeletonLoader
 import { taskService } from '@/services/taskService'
 import { authService } from '@/services/authService'
 import { getSession } from '@/utils/sessionStorage'
-import { Plus, LogOut, Loader2, LayoutGrid, Columns3, Filter, Search, X, AlertCircle, User } from 'lucide-react'
+import { Plus, LogOut, Loader2, LayoutGrid, Columns3, Filter, Search, X, AlertCircle, User, Sun, Moon } from 'lucide-react'
 import NotificationBell from '@/components/notifications/NotificationBell'
+import { useTheme } from '@/contexts/ThemeContext'
 import { format } from 'date-fns'
 
 const Dashboard = () => {
@@ -34,6 +35,7 @@ const Dashboard = () => {
   const [error, setError] = useState('')
   const [userInfo, setUserInfo] = useState(null)
   const [notifications, setNotifications] = useState([])
+  const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -318,10 +320,10 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-200">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header - Enhanced with User Info */}
-        <Card className="mb-6 border-2 shadow-xl bg-white/95 backdrop-blur-sm">
+        <Card className="mb-6 border-2 shadow-xl bg-white/95 dark:bg-gray-800/95 dark:border-gray-700 backdrop-blur-sm">
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
               {/* Left Section - Title & Description */}
@@ -334,7 +336,7 @@ const Dashboard = () => {
                     <CardTitle className="text-4xl font-bold bg-gradient-to-r from-clickup-purple via-clickup-blue to-clickup-teal bg-clip-text text-transparent">
                       Task Dashboard
                     </CardTitle>
-                    <CardDescription className="mt-1.5 text-gray-600 flex items-center gap-2">
+                    <CardDescription className="mt-1.5 text-gray-600 dark:text-gray-400 flex items-center gap-2">
                       <span>Welcome back{userInfo?.name ? `, ${userInfo.name.split(' ')[0]}` : ''}!</span>
                       <span>•</span>
                       <span>{tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}</span>
@@ -388,7 +390,7 @@ const Dashboard = () => {
                 {/* User Info & Logout - Compact */}
                 <div className="flex items-center gap-3">
                   {/* User Avatar & Info */}
-                  <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-white border border-gray-200">
+                  <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
                     <div className="h-8 w-8 rounded-full bg-gradient-to-br from-clickup-purple to-clickup-blue flex items-center justify-center text-white text-xs font-semibold shadow-sm">
                       {userInfo?.name ? (
                         userInfo.name.charAt(0).toUpperCase()
@@ -397,10 +399,10 @@ const Dashboard = () => {
                       )}
                     </div>
                     <div className="text-left hidden md:block">
-                      <div className="text-xs font-semibold text-gray-900 leading-tight">
+                      <div className="text-xs font-semibold text-gray-900 dark:text-gray-100 leading-tight">
                         {userInfo?.name?.split(' ')[0] || 'User'}
                       </div>
-                      <div className="text-[10px] text-gray-500 leading-tight truncate max-w-[120px]">
+                      <div className="text-[10px] text-gray-500 dark:text-gray-400 leading-tight truncate max-w-[120px]">
                         {userInfo?.email || 'user@example.com'}
                       </div>
                     </div>
@@ -432,7 +434,7 @@ const Dashboard = () => {
         )}
 
         {/* Filters and Search - Enhanced Professional Design */}
-        <Card className="mb-6 border-2 shadow-lg bg-white/95 backdrop-blur-sm">
+        <Card className="mb-6 border-2 shadow-lg bg-white/95 dark:bg-gray-800/95 dark:border-gray-700 backdrop-blur-sm">
           <CardHeader className="bg-gradient-to-r from-clickup-purple/10 via-clickup-blue/10 to-clickup-teal/10 border-b-2 border-gray-100 pb-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
