@@ -75,10 +75,10 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <Card className="w-full max-w-md shadow-lg">
-        <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 p-4">
+      <Card className="w-full max-w-md shadow-2xl border-2 bg-white">
+        <CardHeader className="space-y-1 text-center bg-gradient-to-r from-clickup-purple/10 to-clickup-blue/10">
+          <CardTitle className="text-4xl font-bold bg-gradient-to-r from-clickup-purple via-clickup-blue to-clickup-teal bg-clip-text text-transparent">
             NELO Task Manager
           </CardTitle>
           <CardDescription className="text-base">
@@ -153,7 +153,7 @@ const Login = () => {
 
             <Button
               type="submit"
-              className="w-full h-11"
+              className="w-full h-11 bg-clickup-purple hover:bg-clickup-purple/90 text-white shadow-md hover:shadow-lg transition-all"
               disabled={loading}
             >
               {loading ? (

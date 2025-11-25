@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import TaskForm from '@/components/tasks/TaskForm'
 import TaskList from '@/components/tasks/TaskList'
+import DraggableTaskList from '@/components/tasks/DraggableTaskList'
 import TaskFilters from '@/components/tasks/TaskFilters'
 import TaskSearch from '@/components/tasks/TaskSearch'
 import ConfirmDialog from '@/components/common/ConfirmDialog'
@@ -150,6 +151,12 @@ const Dashboard = () => {
     }
   }
 
+  const handleReorder = async (newTasks) => {
+    // Update local state immediately for smooth UX
+    setTasks(newTasks)
+    // Optionally save order to backend if you add an order field
+  }
+
   const handleLogout = () => {
     authService.logout()
   }
@@ -170,26 +177,29 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
-        <Card className="mb-6">
+        <Card className="mb-6 border-2 shadow-lg bg-white">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                <CardTitle className="text-4xl font-bold bg-gradient-to-r from-clickup-purple via-clickup-blue to-clickup-teal bg-clip-text text-transparent">
                   Task Dashboard
                 </CardTitle>
-                <CardDescription className="mt-2">
-                  Manage your tasks efficiently
+                <CardDescription className="mt-2 text-gray-600">
+                  Drag and drop to reorder • Manage your tasks efficiently
                 </CardDescription>
               </div>
               <div className="flex items-center gap-2">
-                <Button onClick={openCreateDialog} className="gap-2">
+                <Button 
+                  onClick={openCreateDialog} 
+                  className="gap-2 bg-clickup-purple hover:bg-clickup-purple/90 text-white shadow-md hover:shadow-lg transition-all"
+                >
                   <Plus className="h-4 w-4" />
                   New Task
                 </Button>
-                <Button variant="outline" onClick={handleLogout} className="gap-2">
+                <Button variant="outline" onClick={handleLogout} className="gap-2 border-gray-300 hover:bg-gray-50">
                   <LogOut className="h-4 w-4" />
                   Logout
                 </Button>
@@ -208,11 +218,11 @@ const Dashboard = () => {
         )}
 
         {/* Filters and Search */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="text-lg">Search & Filter</CardTitle>
+        <Card className="mb-6 border-2 shadow-md bg-white">
+          <CardHeader className="bg-gradient-to-r from-clickup-purple/5 to-clickup-blue/5">
+            <CardTitle className="text-xl font-bold text-gray-800">Search & Filter</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 pt-6">
             <TaskSearch onSearch={setSearchTerm} />
             <TaskFilters
               statusFilter={statusFilter}
@@ -223,19 +233,20 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Tasks List */}
+        {/* Tasks List with Drag and Drop */}
         {loading ? (
           <Card>
             <CardContent className="flex items-center justify-center py-16">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              <Loader2 className="h-8 w-8 animate-spin text-clickup-purple" />
             </CardContent>
           </Card>
         ) : (
-          <TaskList
+          <DraggableTaskList
             tasks={filteredTasks}
             onEdit={openEditDialog}
             onDelete={openDeleteDialog}
             onToggle={handleToggleStatus}
+            onReorder={handleReorder}
           />
         )}
 

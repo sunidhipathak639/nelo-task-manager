@@ -21,6 +21,7 @@ const TaskFilters = ({ statusFilter, priorityFilter, onStatusChange, onPriorityC
             variant={statusFilter === status ? 'default' : 'outline'}
             size="sm"
             onClick={() => onStatusChange(status)}
+            className={statusFilter === status ? 'bg-clickup-purple hover:bg-clickup-purple/90 text-white' : ''}
           >
             {status}
           </Button>
@@ -29,16 +30,25 @@ const TaskFilters = ({ statusFilter, priorityFilter, onStatusChange, onPriorityC
 
       <div className="flex flex-wrap gap-2">
         <span className="text-sm text-muted-foreground self-center">Priority:</span>
-        {priorityOptions.map((priority) => (
-          <Button
-            key={priority}
-            variant={priorityFilter === priority ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => onPriorityChange(priority)}
-          >
-            {priority}
-          </Button>
-        ))}
+        {priorityOptions.map((priority) => {
+          const getPriorityColor = (p) => {
+            if (p === 'High') return priorityFilter === priority ? 'bg-clickup-red hover:bg-clickup-red/90 text-white' : 'border-clickup-red text-clickup-red hover:bg-red-50'
+            if (p === 'Medium') return priorityFilter === priority ? 'bg-clickup-yellow hover:bg-clickup-yellow/90 text-white' : 'border-clickup-yellow text-clickup-yellow hover:bg-yellow-50'
+            if (p === 'Low') return priorityFilter === priority ? 'bg-clickup-green hover:bg-clickup-green/90 text-white' : 'border-clickup-green text-clickup-green hover:bg-green-50'
+            return ''
+          }
+          return (
+            <Button
+              key={priority}
+              variant={priorityFilter === priority ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => onPriorityChange(priority)}
+              className={getPriorityColor(priority)}
+            >
+              {priority}
+            </Button>
+          )
+        })}
       </div>
 
       {(statusFilter !== 'All' || priorityFilter !== 'All') && (

@@ -314,7 +314,7 @@ This project is created for NELO assessment purposes.
 
 ## 👤 Author
 
-[Your Name]
+**SUNIDHI PATHAK**
 
 ## 📧 Contact
 
