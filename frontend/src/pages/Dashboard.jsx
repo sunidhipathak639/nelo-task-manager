@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
+import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
 import TaskForm from '@/components/tasks/TaskForm'
 import TaskList from '@/components/tasks/TaskList'
 import DraggableTaskList from '@/components/tasks/DraggableTaskList'
@@ -12,7 +14,7 @@ import ConfirmDialog from '@/components/common/ConfirmDialog'
 import { taskService } from '@/services/taskService'
 import { authService } from '@/services/authService'
 import { getSession } from '@/utils/sessionStorage'
-import { Plus, LogOut, Loader2, LayoutGrid, Columns3 } from 'lucide-react'
+import { Plus, LogOut, Loader2, LayoutGrid, Columns3, Filter, Search, X, AlertCircle } from 'lucide-react'
 import { format } from 'date-fns'
 
 const Dashboard = () => {
@@ -263,19 +265,127 @@ const Dashboard = () => {
           </Card>
         )}
 
-        {/* Filters and Search */}
-        <Card className="mb-6 border-2 shadow-md bg-white">
-          <CardHeader className="bg-gradient-to-r from-clickup-purple/5 to-clickup-blue/5">
-            <CardTitle className="text-xl font-bold text-gray-800">Search & Filter</CardTitle>
+        {/* Filters and Search - Enhanced Professional Design */}
+        <Card className="mb-6 border-2 shadow-lg bg-white/95 backdrop-blur-sm">
+          <CardHeader className="bg-gradient-to-r from-clickup-purple/10 via-clickup-blue/10 to-clickup-teal/10 border-b-2 border-gray-100 pb-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-clickup-purple/10 rounded-lg">
+                  <Filter className="h-5 w-5 text-clickup-purple" />
+                </div>
+                <div>
+                  <CardTitle className="text-2xl font-bold bg-gradient-to-r from-clickup-purple to-clickup-blue bg-clip-text text-transparent">
+                    Search & Filter
+                  </CardTitle>
+                  <CardDescription className="text-sm text-gray-600 mt-1">
+                    Find and organize your tasks efficiently
+                  </CardDescription>
+                </div>
+              </div>
+              {(statusFilter !== 'All' || priorityFilter !== 'All' || searchTerm) && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setStatusFilter('All')
+                    setPriorityFilter('All')
+                    setSearchTerm('')
+                  }}
+                  className="text-xs text-gray-600 hover:text-clickup-red hover:bg-red-50"
+                >
+                  <X className="h-4 w-4 mr-1" />
+                  Clear All
+                </Button>
+              )}
+            </div>
           </CardHeader>
-          <CardContent className="space-y-4 pt-6">
-            <TaskSearch onSearch={setSearchTerm} />
-            <TaskFilters
-              statusFilter={statusFilter}
-              priorityFilter={priorityFilter}
-              onStatusChange={setStatusFilter}
-              onPriorityChange={setPriorityFilter}
-            />
+          <CardContent className="p-6 space-y-6">
+            {/* Search Section */}
+            <div className="space-y-2">
+              <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                <Search className="h-4 w-4 text-clickup-blue" />
+                Search Tasks
+              </Label>
+              <TaskSearch onSearch={setSearchTerm} />
+            </div>
+
+            {/* Divider */}
+            <div className="border-t border-gray-200"></div>
+
+            {/* Filters Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                  <Filter className="h-4 w-4 text-clickup-purple" />
+                  Status Filter
+                </Label>
+                <TaskFilters
+                  statusFilter={statusFilter}
+                  priorityFilter={priorityFilter}
+                  onStatusChange={setStatusFilter}
+                  onPriorityChange={setPriorityFilter}
+                />
+              </div>
+              <div className="space-y-3">
+                <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 text-clickup-yellow" />
+                  Priority Filter
+                </Label>
+                <div className="flex flex-wrap gap-2">
+                  {['All', 'Low', 'Medium', 'High'].map((priority) => {
+                    const getPriorityColor = (p) => {
+                      if (p === 'High') return priorityFilter === priority 
+                        ? 'bg-clickup-red hover:bg-clickup-red/90 text-white shadow-md' 
+                        : 'border-clickup-red text-clickup-red hover:bg-red-50 hover:border-clickup-red'
+                      if (p === 'Medium') return priorityFilter === priority 
+                        ? 'bg-clickup-yellow hover:bg-clickup-yellow/90 text-white shadow-md' 
+                        : 'border-clickup-yellow text-clickup-yellow hover:bg-yellow-50 hover:border-clickup-yellow'
+                      if (p === 'Low') return priorityFilter === priority 
+                        ? 'bg-clickup-green hover:bg-clickup-green/90 text-white shadow-md' 
+                        : 'border-clickup-green text-clickup-green hover:bg-green-50 hover:border-clickup-green'
+                      return priorityFilter === priority 
+                        ? 'bg-gray-700 hover:bg-gray-800 text-white shadow-md' 
+                        : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                    }
+                    return (
+                      <Button
+                        key={priority}
+                        variant={priorityFilter === priority ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setPriorityFilter(priority)}
+                        className={`${getPriorityColor(priority)} transition-all duration-200 font-medium`}
+                      >
+                        {priority}
+                      </Button>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Active Filters Badge */}
+            {(statusFilter !== 'All' || priorityFilter !== 'All' || searchTerm) && (
+              <div className="flex items-center gap-2 pt-4 border-t border-gray-200">
+                <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200">
+                  Active Filters:
+                </Badge>
+                {statusFilter !== 'All' && (
+                  <Badge className="bg-clickup-purple/10 text-clickup-purple border-clickup-purple/20">
+                    Status: {statusFilter}
+                  </Badge>
+                )}
+                {priorityFilter !== 'All' && (
+                  <Badge className="bg-clickup-yellow/10 text-clickup-yellow border-clickup-yellow/20">
+                    Priority: {priorityFilter}
+                  </Badge>
+                )}
+                {searchTerm && (
+                  <Badge className="bg-clickup-blue/10 text-clickup-blue border-clickup-blue/20">
+                    Search: "{searchTerm}"
+                  </Badge>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
 
