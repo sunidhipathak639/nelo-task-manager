@@ -65,7 +65,7 @@ const KanbanColumn = ({ id, title, tasks, onEdit, onDelete, onToggle, icon: Icon
       ref={setNodeRef} 
       className="flex flex-col h-full min-h-[600px] border-2 transition-all hover:shadow-lg"
     >
-      <CardHeader className={`bg-gradient-to-r from-${color.replace('text-', '')}-50 to-transparent border-b-2 border-${color.replace('text-', '')}-200`}>
+      <CardHeader className={`bg-gradient-to-r ${id === 'Pending' ? 'from-blue-50 border-blue-200' : 'from-green-50 border-green-200'} to-transparent border-b-2`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Icon className={`h-5 w-5 ${color}`} />
