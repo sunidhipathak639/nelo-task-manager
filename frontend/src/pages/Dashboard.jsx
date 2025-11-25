@@ -27,7 +27,7 @@ const Dashboard = () => {
   const [priorityFilter, setPriorityFilter] = useState('All')
   const [searchTerm, setSearchTerm] = useState('')
   const [viewMode, setViewMode] = useState('kanban') // 'kanban' or 'grid'
-  const [error, setError] = setError('')
+  const [error, setError] = useState('')
   const navigate = useNavigate()
 
   useEffect(() => {
