@@ -2,6 +2,8 @@
 
 A full-stack task management application built with React.js and Node.js, featuring CRUD operations, filtering, search, authentication, and automated task reminders.
 
+**Author: SUNIDHI pathak**
+
 ## 🚀 Features
 
 ### Core Functionality
@@ -314,7 +316,7 @@ This project is created for NELO assessment purposes.
 
 ## 👤 Author
 
-**SUNIDHI PATHAK**
+**SUNIDHI pathak**
 
 ## 📧 Contact
 
