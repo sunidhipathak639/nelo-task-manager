@@ -4,12 +4,15 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { authService } from '@/services/authService'
-import { Loader2, Mail, Lock } from 'lucide-react'
+import { Loader2, Mail, Lock, User } from 'lucide-react'
 
 const Login = () => {
+  const [isRegister, setIsRegister] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [name, setName] = useState('')
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
@@ -21,10 +24,16 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    setSuccess('')
 
     // Validation
     if (!email || !password) {
       setError('Please fill in all fields')
+      return
+    }
+
+    if (isRegister && !name.trim()) {
+      setError('Please enter your name')
       return
     }
 
@@ -41,11 +50,20 @@ const Login = () => {
     setLoading(true)
 
     try {
-      const result = await authService.login(email, password)
+      const result = isRegister
+        ? await authService.register(email, password, name)
+        : await authService.login(email, password)
       
       if (result.success) {
-        // Redirect to dashboard
-        navigate('/')
+        if (isRegister) {
+          setSuccess('Account created successfully! Redirecting...')
+          setTimeout(() => {
+            navigate('/')
+          }, 1500)
+        } else {
+          // Redirect to dashboard
+          navigate('/')
+        }
       } else {
         setError(result.error)
       }
@@ -64,7 +82,7 @@ const Login = () => {
             NELO Task Manager
           </CardTitle>
           <CardDescription className="text-base">
-            Sign in to your account to manage your tasks
+            {isRegister ? 'Create a new account to get started' : 'Sign in to your account to manage your tasks'}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -72,6 +90,30 @@ const Login = () => {
             {error && (
               <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
                 {error}
+              </div>
+            )}
+            {success && (
+              <div className="p-3 text-sm text-green-600 bg-green-50 border border-green-200 rounded-md">
+                {success}
+              </div>
+            )}
+
+            {isRegister && (
+              <div className="space-y-2">
+                <label htmlFor="name" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  Full Name
+                </label>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="Enter your name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  disabled={loading}
+                  required={isRegister}
+                  className="h-11"
+                />
               </div>
             )}
 
@@ -117,16 +159,32 @@ const Login = () => {
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Signing in...
+                  {isRegister ? 'Creating account...' : 'Signing in...'}
                 </>
               ) : (
-                'Sign in'
+                isRegister ? 'Create Account' : 'Sign in'
               )}
             </Button>
 
-            <p className="text-xs text-center text-gray-500 mt-4">
-              Don't have an account? Register with any email and password.
-            </p>
+            <div className="text-center mt-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsRegister(!isRegister)
+                  setError('')
+                  setSuccess('')
+                  setName('')
+                  setEmail('')
+                  setPassword('')
+                }}
+                className="text-sm text-blue-600 hover:text-blue-700 hover:underline"
+                disabled={loading}
+              >
+                {isRegister 
+                  ? 'Already have an account? Sign in' 
+                  : "Don't have an account? Create one"}
+              </button>
+            </div>
           </form>
         </CardContent>
       </Card>
