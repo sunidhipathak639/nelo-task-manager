@@ -5,13 +5,14 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import TaskForm from '@/components/tasks/TaskForm'
 import TaskList from '@/components/tasks/TaskList'
 import DraggableTaskList from '@/components/tasks/DraggableTaskList'
+import KanbanBoard from '@/components/tasks/KanbanBoard'
 import TaskFilters from '@/components/tasks/TaskFilters'
 import TaskSearch from '@/components/tasks/TaskSearch'
 import ConfirmDialog from '@/components/common/ConfirmDialog'
 import { taskService } from '@/services/taskService'
 import { authService } from '@/services/authService'
 import { getSession } from '@/utils/sessionStorage'
-import { Plus, LogOut, Loader2 } from 'lucide-react'
+import { Plus, LogOut, Loader2, LayoutGrid, Columns3 } from 'lucide-react'
 import { format } from 'date-fns'
 
 const Dashboard = () => {
@@ -25,7 +26,8 @@ const Dashboard = () => {
   const [statusFilter, setStatusFilter] = useState('All')
   const [priorityFilter, setPriorityFilter] = useState('All')
   const [searchTerm, setSearchTerm] = useState('')
-  const [error, setError] = useState('')
+  const [viewMode, setViewMode] = useState('kanban') // 'kanban' or 'grid'
+  const [error, setError] = setError('')
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -151,6 +153,30 @@ const Dashboard = () => {
     }
   }
 
+  const handleStatusChange = async (taskId, newStatus) => {
+    try {
+      // If status is changing, use toggle or update
+      const task = tasks.find(t => t.id === taskId)
+      if (task && task.status !== newStatus) {
+        // If toggling between Pending and Completed
+        if ((task.status === 'Pending' && newStatus === 'Completed') ||
+            (task.status === 'Completed' && newStatus === 'Pending')) {
+          await handleToggleStatus(taskId)
+        } else {
+          // Direct status update
+          const result = await taskService.updateTask(taskId, { status: newStatus })
+          if (result.success) {
+            await fetchTasks()
+          } else {
+            setError(result.error)
+          }
+        }
+      }
+    } catch (err) {
+      setError('Failed to update task status. Please try again.')
+    }
+  }
+
   const handleReorder = async (newTasks) => {
     // Update local state immediately for smooth UX
     setTasks(newTasks)
@@ -192,6 +218,26 @@ const Dashboard = () => {
                 </CardDescription>
               </div>
               <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 border rounded-lg p-1 bg-white">
+                  <Button
+                    variant={viewMode === 'kanban' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setViewMode('kanban')}
+                    className={viewMode === 'kanban' ? 'bg-clickup-purple hover:bg-clickup-purple/90 text-white' : ''}
+                  >
+                    <Columns3 className="h-4 w-4 mr-1" />
+                    Kanban
+                  </Button>
+                  <Button
+                    variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setViewMode('grid')}
+                    className={viewMode === 'grid' ? 'bg-clickup-purple hover:bg-clickup-purple/90 text-white' : ''}
+                  >
+                    <LayoutGrid className="h-4 w-4 mr-1" />
+                    Grid
+                  </Button>
+                </div>
                 <Button 
                   onClick={openCreateDialog} 
                   className="gap-2 bg-clickup-purple hover:bg-clickup-purple/90 text-white shadow-md hover:shadow-lg transition-all"
@@ -240,6 +286,14 @@ const Dashboard = () => {
               <Loader2 className="h-8 w-8 animate-spin text-clickup-purple" />
             </CardContent>
           </Card>
+        ) : viewMode === 'kanban' ? (
+          <KanbanBoard
+            tasks={filteredTasks}
+            onEdit={openEditDialog}
+            onDelete={openDeleteDialog}
+            onToggle={handleToggleStatus}
+            onStatusChange={handleStatusChange}
+          />
         ) : (
           <DraggableTaskList
             tasks={filteredTasks}
