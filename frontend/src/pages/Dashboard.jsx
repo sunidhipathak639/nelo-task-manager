@@ -11,6 +11,7 @@ import KanbanBoard from '@/components/tasks/KanbanBoard'
 import TaskFilters from '@/components/tasks/TaskFilters'
 import TaskSearch from '@/components/tasks/TaskSearch'
 import ConfirmDialog from '@/components/common/ConfirmDialog'
+import { GridSkeleton, KanbanSkeleton } from '@/components/common/SkeletonLoader'
 import { taskService } from '@/services/taskService'
 import { authService } from '@/services/authService'
 import { getSession } from '@/utils/sessionStorage'
@@ -450,11 +451,11 @@ const Dashboard = () => {
 
         {/* Tasks List with Drag and Drop */}
         {loading ? (
-          <Card>
-            <CardContent className="flex items-center justify-center py-16">
-              <Loader2 className="h-8 w-8 animate-spin text-clickup-purple" />
-            </CardContent>
-          </Card>
+          viewMode === 'kanban' ? (
+            <KanbanSkeleton />
+          ) : (
+            <GridSkeleton />
+          )
         ) : viewMode === 'kanban' ? (
           <KanbanBoard
             tasks={filteredTasks}
