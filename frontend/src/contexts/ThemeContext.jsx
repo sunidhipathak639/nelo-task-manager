@@ -12,12 +12,13 @@ export const useTheme = () => {
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
-    // Check localStorage first, then system preference
+    // Check localStorage first, default to 'light' if not set
     const savedTheme = localStorage.getItem('theme')
     if (savedTheme) {
       return savedTheme
     }
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+    // Default to light theme
+    return 'light'
   })
 
   useEffect(() => {
@@ -27,8 +28,13 @@ export const ThemeProvider = ({ children }) => {
     localStorage.setItem('theme', theme)
   }, [theme])
 
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light')
+  const toggleTheme = (checked) => {
+    // If checked is provided (from Switch), use it; otherwise toggle
+    if (typeof checked === 'boolean') {
+      setTheme(checked ? 'dark' : 'light')
+    } else {
+      setTheme(prev => prev === 'light' ? 'dark' : 'light')
+    }
   }
 
   return (

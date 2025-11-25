@@ -18,6 +18,7 @@ import { getSession } from '@/utils/sessionStorage'
 import { Plus, LogOut, Loader2, LayoutGrid, Columns3, Filter, Search, X, AlertCircle, User, Sun, Moon } from 'lucide-react'
 import NotificationBell from '@/components/notifications/NotificationBell'
 import { useTheme } from '@/contexts/ThemeContext'
+import { Switch } from '@/components/ui/switch'
 import { format } from 'date-fns'
 
 const Dashboard = () => {
@@ -386,6 +387,17 @@ const Dashboard = () => {
                   onMarkAsRead={handleMarkAsRead}
                   onClearAll={handleClearAllNotifications}
                 />
+
+                {/* Theme Toggle Switch */}
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                  <Sun className={`h-4 w-4 transition-colors ${theme === 'light' ? 'text-yellow-500' : 'text-gray-400'}`} />
+                  <Switch
+                    checked={theme === 'dark'}
+                    onCheckedChange={toggleTheme}
+                    className="data-[state=checked]:bg-clickup-purple"
+                  />
+                  <Moon className={`h-4 w-4 transition-colors ${theme === 'dark' ? 'text-blue-400' : 'text-gray-400'}`} />
+                </div>
 
                 {/* User Info & Logout - Compact */}
                 <div className="flex items-center gap-3">
